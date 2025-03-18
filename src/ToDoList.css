@@ -1,0 +1,128 @@
+/* ✅ Main container styling */
+.to-do-list {
+    background-color: #1a1a1a;
+    color: white;
+    padding: 20px;
+    max-width: 1000px; /* Increased width */
+    margin: 20px auto;
+    border-radius: 10px;
+}
+
+/* ✅ Input section */
+.input-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* ✅ Search bar and task input */
+.search-bar,
+.task-input {
+    padding: 12px;
+    width: 70%; /* Wider input fields */
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+/* ✅ Buttons (add, log, generate) */
+.add-button, .log-button, .generate-button {
+    padding: 12px 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 16px;
+}
+
+.add-button:hover, .generate-button:hover {
+    background-color: #3e8e41;
+}
+
+.log-button {
+    background-color: #007BFF;
+}
+
+.generate-button {
+    background-color: #28a745;
+}
+
+/* ✅ Task container */
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: #f8f8f8;
+    color: #333;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    transition: background-color 0.2s ease;
+}
+
+.task-item:hover {
+    background-color: #e8e8e8;
+}
+
+/* ✅ Task text alignment */
+.task-text {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+}
+
+/* ✅ Button container for proper alignment */
+.task-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Even spacing between buttons */
+}
+
+/* ✅ Delete button */
+.delete-button {
+    background-color: red;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.delete-button:hover {
+    background-color: #cc0000;
+}
+
+/* ✅ Move buttons */
+.move-button {
+    background-color: #007BFF;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.move-button:hover {
+    background-color: #0056b3;
+}
+
+/* ✅ Loading text */
+.loading {
+    font-size: 20px;
+    text-align: center;
+    padding: 12px;
+    color: #999;
+}
+
+.loading-text {
+    font-size: 18px;
+    color: #777;
+    margin-top: 12px;
+}

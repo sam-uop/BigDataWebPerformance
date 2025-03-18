@@ -1,107 +1,184 @@
+import axios from 'axios';
+import './App.css';
+import './ToDoList.css';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FixedSizeList } from 'react-window';
+import InfiniteLoader from 'react-window-infinite-loader';
 
-import React, { useState } from 'react';
+function ToDoList() {
+    const [tasks, setTasks] = useState([]); // Store all tasks (initial + fetched)
+    const [newTask, setNewTask] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [page, setPage] = useState(0);
 
-function ToDoList(){
+    const pageSize = 20005;
 
-    const [tasks, setTasks] = useState([]);
-    const [newTask, setNewTask] = useState("");
+    // Load tasks on initial render
+    useEffect(() => {
+        loadMoreTasks(0); // Load the first 50 tasks on page load
+    }, []);
 
-    function handleInputChange(event){
-        setNewTask(event.target.value)
-        // alert(1);
-    } 
+    // Load more tasks function (pagination logic)
+    const loadMoreTasks = useCallback(async (currentPage) => {
+        if (isLoading || !hasMore) return;
 
-    function addTask(){
-
-        if(newTask.trim() !== ""){
-            setTasks (t => [...t, newTask]);
-            setNewTask ("");
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`http://localhost:5001/tasks?start=${currentPage * pageSize}&limit=${pageSize}`);
+            if (response.data.length === 0) {
+                setHasMore(false); // Stop loading if no more data
+            } else {
+                setTasks((prevTasks) => [...prevTasks, ...response.data]); // Append new tasks to existing ones
+                setPage(currentPage + 1); // Increment page for next load
+            }
+        } catch (error) {
+            console.error('Error loading more tasks:', error);
         }
-    }
+        setIsLoading(false);
+    }, [isLoading, hasMore, page]);
 
-    function deleteTask(index){
+    // Filter tasks based on search term
+    const filteredTasks = tasks.filter(task =>
+        task.text.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-        const updatedTasks = tasks.filter((_, i) => i !== index);
-        setTasks(updatedTasks);
-        console.log(tasks);
+    const isItemLoaded = (index) => index < filteredTasks.length;
 
-    }
-
-    function moveTaskUp(index){
-
-        if(index>0) {
-            const updatedTasks = [...tasks];
-            [updatedTasks[index],updatedTasks[index - 1]] = [updatedTasks[index - 1],updatedTasks[index]]
-            setTasks(updatedTasks);
+    // Trigger load when reaching the bottom
+    const loadMoreItems = async () => {
+        if (!isLoading && hasMore) {
+            await loadMoreTasks(page);
         }
-    }
+    };
 
-    function moveTaskDown(index){
+    // Handle new task input
+    const handleInputChange = (e) => setNewTask(e.target.value);
+    const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
-        if(index < tasks.length - 1) {
-            const updatedTasks = [...tasks];
-            [updatedTasks[index],updatedTasks[index + 1]] = [updatedTasks[index + 1],updatedTasks[index]]
-            setTasks(updatedTasks);
+    // Add new task
+    const addTask = async () => {
+        if (newTask.trim()) {
+            try {
+                const response = await axios.post('http://localhost:5001/tasks', { text: newTask });
+                setTasks((prevTasks) => [response.data, ...prevTasks]);
+                setNewTask('');
+            } catch (error) {
+                console.error('Error adding task:', error);
+            }
         }
-        // if a==0?print:
-    }
+    };
 
-    function callConsoleLog(){
-        console.log(tasks);
-    }
+    // Delete task
+    const deleteTask = async (id) => {
+        try {
+            await axios.delete(`http://localhost:5001/tasks/${id}`);
+            setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
+        } catch (error) {
+            console.error('Error deleting task:', error);
+        }
+    };
 
-    return(
-    <div className='to-do-list'>
-        <title>ToDo List</title>
-        <h1>To-Do-List</h1>
+    // Move task up
+    const moveTaskUp = async (index) => {
+        if (index > 0) {
+            try {
+                const response = await axios.put('http://localhost:5001/tasks/reorder', {
+                    sourceIndex: index,
+                    destinationIndex: index - 1,
+                });
+                setTasks(response.data);
+            } catch (error) {
+                console.error('Error moving task up:', error);
+            }
+        }
+    };
 
-        <div>
-            <input 
-            type = "text"
-            placeholder='Enter a Task..'
-            value={newTask}
-            onChange={handleInputChange}
+    // Move task down
+    const moveTaskDown = async (index) => {
+        if (index < tasks.length - 1) {
+            try {
+                const response = await axios.put('http://localhost:5001/tasks/reorder', {
+                    sourceIndex: index,
+                    destinationIndex: index + 1,
+                });
+                setTasks(response.data);
+            } catch (error) {
+                console.error('Error moving task down:', error);
+            }
+        }
+    };
+
+    return (
+        <div className="to-do-list">
+            <h1>To-Do List</h1>
+
+            {/* Search Bar */}
+            <input
+                type="text"
+                placeholder="Search tasks..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="search-bar"
             />
 
-            <button
-                className = "add-button"
-                onClick = {addTask}>
-                Add
-            </button>
-            <button
-                className='move-button'
-                onClick={() => callConsoleLog()}>
-                    LOG  
-            </button>
+            {/* Task input */}
+            <div>
+                <input
+                    type="text"
+                    placeholder="Enter a task..."
+                    value={newTask}
+                    onChange={handleInputChange}
+                    className="task-input"
+                />
+                <button onClick={addTask} className="add-button">
+                    Add
+                </button>
+            </div>
+
+            {/* Infinite Scrolling */}
+            <InfiniteLoader
+                isItemLoaded={isItemLoaded}
+                itemCount={hasMore ? filteredTasks.length + 1 : filteredTasks.length}
+                loadMoreItems={loadMoreItems}
+            >
+                {({ onItemsRendered, ref }) => (
+                    <FixedSizeList
+                        height={600}
+                        width="100%"
+                        itemSize={60}
+                        itemCount={filteredTasks.length}
+                        onItemsRendered={onItemsRendered}
+                        ref={ref}
+                    >
+                        {({ index, style }) => {
+                            const task = filteredTasks[index];
+
+                            return (
+                                <div style={style} className="task-item">
+                                    <span>{task.text}</span>
+                                    <div className="task-buttons">
+                                        <button onClick={() => deleteTask(task._id)} className="delete-button">
+                                            Delete
+                                        </button>
+                                        <button onClick={() => moveTaskUp(index)} className="move-button">
+                                            ▲
+                                        </button>
+                                        <button onClick={() => moveTaskDown(index)} className="move-button">
+                                            ▼
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        }}
+                    </FixedSizeList>
+                )}
+            </InfiniteLoader>
+
+            {isLoading && <p className="loading-text">Loading more tasks...</p>}
         </div>
-
-        <ol>
-            {tasks.map((task, index) => 
-                <li key={index}>
-                    <span className='text'>{task}</span>
-                    <button
-                        className='delete-button'
-                        onClick = {() => deleteTask(index)
-                        }>
-                            Delete 
-                    </button>
-                    <button
-                        className='move-button'
-                        onClick={() => moveTaskUp(index)}>
-                            🔼
-                    </button>
-                    <button
-                        className='move-button'
-                        onClick={() => moveTaskDown(index)}>
-                            🔽   
-                    </button>
-                    
-                </li>
-            )}
-        </ol>
-
-
-    </div>
     );
 }
+
 export default ToDoList;
