@@ -8,6 +8,8 @@
     border-radius: 10px;
 }
 
+
+
 /* ✅ Input section */
 .input-section {
     display: flex;
@@ -24,6 +26,7 @@
     border: 1px solid #ccc;
     font-size: 16px;
 }
+
 
 /* ✅ Buttons (add, log, generate) */
 .add-button, .log-button, .generate-button {
@@ -54,15 +57,50 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: 20px;
     background-color: #f8f8f8;
     color: #333;
-    margin-bottom: 8px;
-    border-radius: 8px;
+    margin-bottom: 12px;
+    border-radius: 16px;
     font-size: 18px;
     border: 1px solid #ccc;
     transition: background-color 0.2s ease;
+    box-sizing: border-box;
 }
+
+.react-dropdown-select {
+    background-color: #333 !important;
+    color: white !important;
+    border: 1px solid #888 !important;
+  }
+  
+  .react-dropdown-select-dropdown {
+    background-color: #222 !important;
+    color: white !important;
+  }
+  
+  .react-dropdown-select-item {
+    color: white !important;
+  }
+  
+  .react-dropdown-select-item:hover {
+    background-color: #444 !important;
+  }
+  
+
+.task-item {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center vertically */
+    padding: 18px 24px; /* Add horizontal and vertical padding */
+}
+
+.task-item {
+    width: 100%; /* Take full width */
+    box-sizing: border-box; /* Include padding and border in width */
+}
+
+
 
 .task-item:hover {
     background-color: #e8e8e8;
