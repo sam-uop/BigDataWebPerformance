@@ -3,7 +3,7 @@ import { RedditProvider } from './context/RedditContext';
 import RedditCount from './components/RedditCount';
 import RedditSummary from './components/RedditSummary';
 import SearchBar from './components/SearchBar';
-import ChatSection from './components/ChatSection'; // 🆕 Import Chat
+// import ChatSection from './components/ChatSection'; // 🆕 Import Chat
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('chrome');
@@ -25,9 +25,9 @@ const App = () => {
         </div>
 
         {/* Right side: Chat */}
-        <div style={{ flex: 1, borderLeft: '1px solid #ccc', paddingLeft: '20px' }}>
-          <ChatSection />
-        </div>
+        {/* <div style={{ flex: 1, borderLeft: '1px solid #ccc', paddingLeft: '20px' }}> */}
+          {/* <ChatSection /> */}
+        {/* </div> */}
       </div>
     </RedditProvider>
   );
